@@ -25,6 +25,20 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const productsCollection = client.db('productsDB').collection('products');
+
+    app.get('/products', async (req, res) => {
+      const cursor = productsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    app.post("/products", async (req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+      res.send(result);
+    })
+
 
 
 
@@ -38,10 +52,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get ('/',(req, res) => {
-    res.send("FASHION BRAND SHOP SERVER IS RUNNING...")
+app.get('/', (req, res) => {
+  res.send("FASHION BRAND SHOP SERVER IS RUNNING...")
 })
 
-app.listen(port,() => {
-    console.log(`Fashion Brand Shop Server is running: ${port}`)
+app.listen(port, () => {
+  console.log(`Fashion Brand Shop Server is running: ${port}`)
 })
