@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -33,11 +33,60 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    })
+
     app.post("/products", async (req, res) => {
       const product = req.body;
       const result = await productsCollection.insertOne(product);
       res.send(result);
     })
+
+    app.put('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const product = req.body;
+      console.log(id, product);
+      const filter = { _id: new ObjectId(id) }
+
+      const options = { upsert: true }
+      const updatedProduct = {
+        $set: {
+          photoUrl:product.photoUrl,
+          name: product.name,
+          brand: product.brand,
+          type: product.type,
+          price: product.price,
+          rating: product.rating
+        }
+      }
+      const result = await productsCollection.updateOne(filter, updatedProduct, options);
+      res.send(result);
+    })
+
+    // app.put('/products/:id', async (req, res) => {
+    //   const id = req.params.id;
+    //   const product = req.body;
+    //   console.log(id, product);
+    //   const filter = { _id: new ObjectId(id) }
+
+    //   const options = { upsert: true }
+    //   const updatedproduct = {
+    //     $set: {
+    //       photoUrl: product.photoUrl,
+    //       name: product.name,
+    //       brand: product.brand,
+    //       type: product.brand,
+    //       price: product.price,
+    //       rating: product.rating
+    //     }
+    //   }
+    //   const result = await productsCollection.updateOne(filter, updatedproduct, options);
+    //   res.send(result);
+    // })
 
 
 
