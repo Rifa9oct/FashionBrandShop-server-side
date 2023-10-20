@@ -26,7 +26,7 @@ async function run() {
     await client.connect();
 
     const productsCollection = client.db('productsDB').collection('products');
-    const mycartsCollection = client.db('productsDB').collection('mycarts')
+    const mycartsCollection = client.db('productsDB').collection('mycarts');
 
     app.get('/products', async (req, res) => {
       const cursor = productsCollection.find();
@@ -75,34 +75,27 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/mycarts/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await mycartsCollection.findOne(query);
+      res.send(result);
+    })
+
     app.post("/mycarts", async (req, res) => {
       const cart = req.body;
       const result = await mycartsCollection.insertOne(cart);
       res.send(result);
     })
 
-    // app.put('/products/:id', async (req, res) => {
-    //   const id = req.params.id;
-    //   const product = req.body;
-    //   console.log(id, product);
-    //   const filter = { _id: new ObjectId(id) }
+    app.delete('/mycarts/:id', async(req, res) =>{
+      const id = req.params.id;
+      console.log("please delete from database", id);
+      const query = {_id: new ObjectId(id)}
 
-    //   const options = { upsert: true }
-    //   const updatedproduct = {
-    //     $set: {
-    //       photoUrl: product.photoUrl,
-    //       name: product.name,
-    //       brand: product.brand,
-    //       type: product.brand,
-    //       price: product.price,
-    //       rating: product.rating
-    //     }
-    //   }
-    //   const result = await productsCollection.updateOne(filter, updatedproduct, options);
-    //   res.send(result);
-    // })
-
-
+      const result = await  mycartsCollection.deleteOne(query);
+      res.send(result);
+  })
 
 
     // Send a ping to confirm a successful connection
